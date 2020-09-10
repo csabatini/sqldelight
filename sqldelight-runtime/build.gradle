@@ -5,6 +5,45 @@ buildscript {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+
+android {
+  compileSdkVersion 29
+  buildToolsVersion "30.0.0"
+}
+
+task androidJavaDoc(type: Javadoc) {
+  source = android.sourceSets.main.java.srcDirs
+  classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+  options.encoding "UTF-8"
+  options.charSet 'UTF-8'
+  options.author true
+  options.version true
+  failOnError false
+}
+
+task androidJavaDocJar(type: Jar, dependsOn: androidJavaDoc) {
+  classifier = 'javadoc'
+  from androidJavaDoc.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+  classifier = 'sources'
+  from android.sourceSets.main.java.srcDirs
+}
+
+publishing {
+  publications {
+    maven(MavenPublication) {
+      groupId = 'com.squareup.sqldelight'
+      artifactId = 'runtime'
+      version = '0.6.2'
+
+      artifact androidJavaDocJar
+      artifact androidSourcesJar
+    }
+  }
+}
 
 android {
   compileSdkVersion rootProject.ext.compileSdkVersion
@@ -50,4 +89,4 @@ android.libraryVariants.all { variant ->
   artifacts.add('jar', task);
 }
 
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+//apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
