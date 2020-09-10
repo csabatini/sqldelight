@@ -8,6 +8,12 @@ together, organized, and easy to access from Java.
 Example
 -------
 
+NOTE: To build locally
+`./gradlew clean build publishToMavenLocal -x test`
+
+AAR not getting published?
+`./gradlew sqldelight-runtime:bundleReleaseAar`
+
 To use SQLDelight, put your SQL statements in a `.sq` file, like
 `src/main/sqldelight/com/example/HockeyPlayer.sq`. Typically the first statement creates a table.
 
