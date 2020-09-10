@@ -34,11 +34,12 @@ task androidSourcesJar(type: Jar) {
 
 publishing {
   publications {
-    maven(MavenPublication) {
+    aar(MavenPublication) {
       groupId = 'com.squareup.sqldelight'
       artifactId = 'runtime'
       version = '0.6.2'
 
+      artifact bundleReleaseAar
       artifact androidJavaDocJar
       artifact androidSourcesJar
     }
