@@ -10,6 +10,21 @@ apply plugin: 'maven-publish'
 android {
   compileSdkVersion 29
   buildToolsVersion "30.0.0"
+
+  defaultConfig {
+    minSdkVersion 16
+    targetSdkVersion 29
+    versionCode 1
+    versionName "0.1.0"
+  }
+}
+
+dependencies {
+  compile 'androidx.appcompat:appcompat:1.0.2'
+  compile 'androidx.annotation:annotation:1.0.2'
+
+  testCompile 'junit:junit:4.12'
+  testCompile 'com.squareup.okio:okio:1.11.0'
 }
 
 task androidJavaDoc(type: Javadoc) {
@@ -46,35 +61,6 @@ publishing {
       }
     }
   }
-}
-
-android {
-  compileSdkVersion rootProject.ext.compileSdkVersion
-  buildToolsVersion rootProject.ext.buildToolsVersion
-
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_7
-    targetCompatibility JavaVersion.VERSION_1_7
-  }
-
-  lintOptions {
-    textOutput 'stdout'
-  }
-
-  dexOptions {
-    preDexLibraries = !rootProject.ext.isCi
-  }
-
-  defaultConfig {
-    minSdkVersion 4
-  }
-}
-
-dependencies {
-  compile dep.supportAnnotations
-
-  testCompile dep.junit
-  testCompile dep.okio
 }
 
 configurations {
