@@ -1,6 +1,6 @@
 buildscript {
   dependencies {
-    classpath dep.androidPlugin
+    classpath 'com.android.tools.build:gradle:3.1.2'
   }
 }
 
@@ -20,11 +20,11 @@ android {
 }
 
 dependencies {
-  compile 'androidx.appcompat:appcompat:1.0.2'
-  compile 'androidx.annotation:annotation:1.0.2'
+  implementation 'androidx.appcompat:appcompat:1.0.2'
+  implementation 'androidx.annotation:annotation:1.0.2'
 
-  testCompile 'junit:junit:4.12'
-  testCompile 'com.squareup.okio:okio:1.11.0'
+  testImplementation'junit:junit:4.12'
+  testImplementation 'com.squareup.okio:okio:1.11.0'
 }
 
 task androidJavaDoc(type: Javadoc) {
@@ -48,24 +48,54 @@ task androidSourcesJar(type: Jar) {
 }
 
 publishing {
-  publications {
-    aar(MavenPublication) {
-      groupId = 'com.squareup.sqldelight'
-      artifactId = 'runtime'
-      version = '0.6.2'
+    publications {
+      aar(MavenPublication) {
+        groupId = 'com.squareup.sqldelight'
+        artifactId = 'runtime'
+        version = '0.6.2'
+        afterEvaluate {
+          artifact bundleReleaseAar
+          artifact androidJavaDocJar
+          artifact androidSourcesJar
 
-      afterEvaluate {
-        artifact bundleReleaseAar
-        artifact androidJavaDocJar
-        artifact androidSourcesJar
+
+          pom.withXml {
+            def rootNode = asNode().appendNode('dependencies')
+
+            /**
+             * Helper method to add dependencies to the POM node
+             */
+            ext.addDependency = { groovy.util.Node dependenciesNode, Dependency dependency, String dependencyScope ->
+              // We don't add incomplete dependencies
+              if (dependency.name == null ||
+                      dependency.name == 'unspecified' ||
+                      dependency.group == null ||
+                      dependency.version == null) {
+                return
+              }
+
+              def dependencyNode = dependenciesNode.appendNode('dependency')
+              dependencyNode.appendNode('groupId', dependency.group)
+              dependencyNode.appendNode('artifactId', dependency.name)
+              dependencyNode.appendNode('version', dependency.version)
+              dependencyNode.appendNode('scope', dependencyScope)
+            }
+
+            // Iterate over the implementation dependencies, adding a <dependency> node for each
+            configurations.implementation.dependencies.each {
+              addDependency(rootNode, it, "runtime")
+            }
+
+            // Iterate over the api dependencies, adding a <dependency> node for each
+            configurations.api.dependencies.each {
+              addDependency(rootNode, it, "compile")
+            }
+          }
       }
     }
   }
 }
 
-configurations {
-  jar
-}
 //android.libraryVariants.all { variant ->
 //  if (variant.name != 'release') return
 //
