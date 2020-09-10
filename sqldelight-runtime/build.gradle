@@ -39,9 +39,11 @@ publishing {
       artifactId = 'runtime'
       version = '0.6.2'
 
-      artifact bundleReleaseAar
-      artifact androidJavaDocJar
-      artifact androidSourcesJar
+      afterEvaluate {
+        artifact bundleReleaseAar
+        artifact androidJavaDocJar
+        artifact androidSourcesJar
+      }
     }
   }
 }
